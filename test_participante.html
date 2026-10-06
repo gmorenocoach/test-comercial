@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de los 4 Elementos</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI','Calibri',sans-serif;background:#EEF1F5;color:#1A1A2E;font-size:15px;min-height:100vh}
+.topbar{background:#0D1B2A;display:flex;align-items:stretch}
+.tb-accent{width:5px;background:#C4973B;flex-shrink:0}
+.tb-text{padding:14px 20px}
+.tb-text h1{font-size:15px;font-weight:700;color:#fff;letter-spacing:.4px;text-transform:uppercase}
+.tb-text p{font-size:11px;color:#8A9BB0;margin-top:2px}
+.app{max-width:680px;margin:0 auto;padding:24px 16px 60px}
+.step-bar{display:flex;align-items:center;margin-bottom:24px}
+.sb-item{display:flex;align-items:center;gap:6px;flex:1}
+.sb-num{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:2px solid #D0D8E4;color:#B0BCC8;background:#fff;flex-shrink:0;transition:all .3s}
+.sb-num.done{background:#0D1B2A;border-color:#0D1B2A;color:#fff}
+.sb-num.act{background:#C4973B;border-color:#C4973B;color:#fff}
+.sb-lbl{font-size:11px;color:#B0BCC8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;white-space:nowrap}
+.sb-lbl.act,.sb-lbl.done{color:#0D1B2A}
+.sb-line{flex:1;height:2px;background:#D0D8E4;margin:0 8px}
+.sb-line.done{background:#0D1B2A}
+.panel{display:none}.panel.act{display:block;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.card{background:#fff;border:1px solid #D8DFE8;border-radius:4px;padding:20px 22px;margin-bottom:14px}
+.card-accent{border-top:3px solid #0D1B2A}
+.sec-label{font-size:10px;font-weight:700;color:#6B7A8D;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.sec-title{font-size:22px;font-weight:700;color:#0D1B2A;margin-bottom:6px;line-height:1.2}
+.sec-sub{font-size:14px;color:#6B7A8D;line-height:1.65}
+.inp{border:1px solid #D0D8E4;border-radius:3px;padding:9px 12px;font-size:14px;font-family:inherit;background:#FAFBFC;color:#1A1A2E;width:100%}
+.inp:focus{outline:none;border-color:#0D1B2A;background:#fff}
+.btn{border:1px solid #D0D8E4;border-radius:3px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;text-transform:uppercase;letter-spacing:.5px;transition:all .15s}
+.btn-primary{background:#0D1B2A;color:#fff;border-color:#0D1B2A}
+.btn-primary:hover{background:#1A3248}
+.btn-ghost{background:#fff;color:#6B7A8D;border-color:#D0D8E4}
+.btn-ghost:hover{border-color:#0D1B2A;color:#0D1B2A}
+.test-cols{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
+.col-head{text-align:center;padding:8px 4px;border-radius:3px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;background:#F4F6F8;color:#6B7A8D}
+.renglon-wrap{margin-bottom:10px}
+.renglon-num{font-size:10px;color:#B0BCC8;font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px;text-align:center}
+.renglon{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.opcion{background:#F8F9FB;border:1.5px solid #E2E8F0;border-radius:3px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .18s;font-size:13px;color:#6B7A8D;user-select:none;position:relative;font-weight:500;line-height:1.3}
+.opcion:hover{border-color:#0D1B2A;color:#0D1B2A;background:#fff}
+.opcion.pos{border-color:#2E6B8A;background:#EAF3F8;color:#1A4F6B;font-weight:600}
+.opcion.neg{border-color:#8A3A2E;background:#F8EDEA;color:#6B2820;font-weight:600}
+.opcion.pos::after{content:"+1";position:absolute;top:3px;right:4px;font-size:9px;font-weight:700;color:#2E6B8A}
+.opcion.neg::after{content:"-1";position:absolute;top:3px;right:4px;font-size:9px;font-weight:700;color:#8A3A2E}
+.prog-wrap{margin-bottom:16px}
+.prog-label{font-size:12px;color:#6B7A8D;margin-bottom:5px}
+.prog-track{height:5px;background:#E2E8F0;border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,#0D1B2A,#C4973B);border-radius:3px;transition:width .3s}
+.score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid #E2E8F0}
+.score-box{text-align:center;padding:10px 4px;border-radius:3px;border:1px solid #E2E8F0;background:#F8F9FB}
+.score-val{font-size:22px;font-weight:700;display:block;line-height:1}
+.score-lbl{font-size:9px;font-weight:700;color:#B0BCC8;text-transform:uppercase;letter-spacing:.6px;display:block;margin-top:4px}
+/* RESULTADO */
+.elem-hero{border-radius:4px;padding:26px 22px;margin-bottom:14px;border:2px solid;text-align:center}
+.prop-block{padding:12px 14px;border-radius:3px;margin-bottom:10px;border-left:3px solid}
+.prop-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:5px}
+.prop-txt{font-size:13px;color:#3A4A5C;line-height:1.65}
+.char-list{list-style:none;padding:0}
+.char-list li{display:flex;gap:10px;align-items:flex-start;padding:7px 0;border-bottom:1px solid #F0F2F5;font-size:13px;color:#3A4A5C;line-height:1.55}
+.char-list li:last-child{border-bottom:none}
+.char-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px}
+.act-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid #F0F2F5;font-size:13px;color:#3A4A5C;line-height:1.6}
+.act-item:last-child{border-bottom:none}
+.act-num{font-size:11px;font-weight:700;min-width:22px;flex-shrink:0;margin-top:1px}
+.opp-box{border-radius:4px;padding:16px 18px;margin-bottom:10px}
+.opp-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;margin-bottom:6px}
+.opp-txt{font-size:13px;line-height:1.65}
+
+.qr-box{background:#fff;border:2px solid #C4973B;border-radius:4px;padding:20px 22px;text-align:center;margin-bottom:14px}
+.qr-label{font-size:10px;font-weight:700;color:#0D1B2A;text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.qr-sub{font-size:12px;color:#6B7A8D;margin-bottom:14px;line-height:1.6}
+.qr-canvas{display:inline-block;padding:14px;background:#fff;border:2px solid #0D1B2A;border-radius:4px;margin-bottom:12px}
+.qr-code-txt{font-size:11px;font-weight:700;color:#0D1B2A;background:#F4F6F8;padding:6px 14px;border-radius:3px;letter-spacing:2px;display:inline-block}
+
+.download-box{background:#0D1B2A;border-radius:4px;padding:20px 22px;text-align:center;margin-bottom:14px}
+.dl-label{font-size:10px;font-weight:700;color:#C4973B;text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+.dl-text{font-size:12px;color:#8A9BB0;margin-bottom:14px;line-height:1.6}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:18px;padding-top:14px;border-top:1px solid #E2E8F0;gap:10px}
+.note-box{background:#F5EFE3;border-left:3px solid #C4973B;border-radius:0 3px 3px 0;padding:12px 14px;margin-bottom:14px;font-size:13px;color:#3A4A5C;line-height:1.6}
+.map-row{display:flex;gap:10px;margin-bottom:10px}
+.map-badge{flex:1;text-align:center;padding:12px 8px;border-radius:3px;border:1px solid}
+.map-badge-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;display:block;margin-bottom:5px}
+.map-badge-val{font-size:15px;font-weight:700;display:block}
+.liderazgo-tag{display:inline-block;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:8px}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+<div class="topbar">
+  <div class="tb-accent"></div>
+  <div class="tb-text">
+    <h1>Test de los 4 Elementos</h1>
+    <p>Salud Ocupacional Integral Soy SAS &nbsp;&middot;&nbsp; Tel. 311 211 2239</p>
+  </div>
+</div>
+<div class="app">
+  <div class="step-bar" id="step-bar"></div>
+  <div id="panels"></div>
+</div>
+<script>
+var RENGLONES=[["Soñador","Investigador","Realista","Analítico"],["Adaptable","Inquieto","Organizado","Evaluador"],["Me relaciono","Creativo","Voy a los hechos","Discuto"],["Personal","Aventurero","Práctico","Teórico"],["Flexible","Inventivo","Preciso","Estratégico"],["Comparto","Independiente","Ordenado","Desapegado"],["Cooperativo","Competitivo","Perfeccionista","Lógico"],["Sensitivo","Arriesgado","Trabajador","Intelectual"],["Siente","Experimenta","Hace","Piensa"],["Me preocupo","Desafío","Hago prácticas","Observo"]];
+var ECOLS=["agua","fuego","tierra","aire"];
+var ELN={agua:"Agua",fuego:"Fuego",tierra:"Tierra",aire:"Aire"};
+var SIM={agua:"≈",fuego:"△",tierra:"■",aire:"○"};
+var ECOLOR={agua:"#2E6B8A",fuego:"#8A3A2E",tierra:"#6B5329",aire:"#3A5268"};
+var EBGCSS={agua:"#EAF3F8",fuego:"#F8EDEA",tierra:"#F5EFE3",aire:"#EAF0F5"};
+
+var PERFILES={
+  agua:{
+    frase:"Vendes desde el corazón. Tu cliente no te compra un producto — te compra a ti.",
+    esencia:"El Agua construye relaciones antes de construir ventas. Tu mayor fortaleza comercial es que los clientes confían en ti desde el primer minuto, y esa confianza se convierte en fidelización a largo plazo.",
+    fortalezas:["Generas confianza y conexión emocional rápida","Escuchas activamente las necesidades reales del cliente","Fidelizas: tus clientes vuelven y te refieren","Detectas necesidades emocionales que el cliente no dice en voz alta","Creas relaciones duraderas que van más allá de la venta"],
+    sombras:["Evitas pedir el cierre para no generar incomodidad","Cedes en precio para mantener la armonía","Te cuesta hacer seguimiento directo sin sentirte invasivo","Tardas en cerrar porque quieres que la relación esté 'perfecta' primero"],
+    liderazgo:{tipo:"El Consultor Empático",desc:"Vendes desde la confianza y la escucha. No empujas — acompañas. Tu cliente siente que lo entiendes mejor que nadie. Tu reto es aprender a pedir el cierre con la misma naturalidad con que construyes la relación."},
+    actividades:["Practica pedir el cierre en conversaciones de bajo riesgo — con un 'sí' no pierdes la relación","Establece un precio mínimo no negociable y defién delo con datos, no con disculpas","Crea un sistema de seguimiento que se sienta personal, no invasivo (WhatsApp + nombre + contexto)","Estudia técnicas de cierre consultivo: no es presión, es servicio","Trabaja con un cliente Fuego — obsérva cómo pide la venta sin miedo"],
+    opuesto_trabajo:"Tu cliente Aire parece frío o difícil de conectar, pero tiene algo que tú necesitas entender: compra con la cabeza, no con el corazón. Para venderle al Aire: llega con datos, argumentos lógicos y propuestas estructuradas. No empieces por la relación — empieza por el problema que resuelves. La conexión emocional vendrá después, cuando la lógica ya lo convenció.",
+    opuesto_hogar:"En la vida personal, el Aire es tu complemento ideal. Donde tú sientes, él analiza. Juntos: emoción y razón en equilibrio.",
+    plan:["Esta semana: en tu próxima visita, practica decir 'Entonces, ¿arrancamos?' antes de que el cliente te lo pida.","Este mes: define tu precio mínimo por producto y practica decirlo sin pedir disculpas.","En 3 meses: toma un curso de cierre de ventas consultivo — aprende a cerrar sin perder la relación.","En 6 meses: mide tu tasa de conversión y ponla como objetivo mensual, no solo los ingresos."],
+    como_abordar:{
+      agua:"Conecta desde lo personal antes del negocio. Pregunta por su equipo, su contexto, sus preocupaciones. La venta viene después de la conversación.",
+      fuego:"Ve al punto rápido — él ya decidió si le interesa en los primeros 2 minutos. Sé directo, usa su energía, no lo frenes con detalles.",
+      tierra:"Lleva todo documentado. Casos de éxito, cifras, garantías. Él necesita evidencia antes de comprometerse. La paciencia aquí es clave.",
+      aire:"Argumenta con lógica. Muestra el análisis costo-beneficio. No uses emoción — usa datos. Responde sus preguntas técnicas con precisión."
+    }
+  },
+  fuego:{
+    frase:"Llegas, convences y cierras. El mundo comercial se mueve cuando tú decides que es el momento.",
+    esencia:"El Fuego caza oportunidades con energía y audacia. Abres puertas donde otros no llaman, contagias entusiasmo y cierras rápido cuando el cliente está caliente. Tu mayor reto no es vender — es sostener lo que vendes.",
+    fortalezas:["Prospectas con audacia — abres puertas donde otros no llaman","Contagias entusiasmo y urgencia","Cierras rápido cuando el cliente está en el momento","Amas el reto de cuentas nuevas y mercados inexplorados","Motivas a todo el equipo comercial con tu energía"],
+    sombras:["No haces seguimiento postventa — vendes y desapareces","Dejas procesos a medias cuando pierdes el entusiasmo","Puedes presionar demasiado y quemar la relación","Improvisas cuando el cliente necesita documentación y estructura"],
+    liderazgo:{tipo:"El Cazador",desc:"Vendes desde la energía y el momentum. Eres el primero en llamar, el primero en proponer, el primero en cerrar. Tu reto es aprender que la venta no termina con el sí — empieza ahí."},
+    actividades:["Crea un sistema de seguimiento postventa de 30/60/90 días — escríbelo, no lo improvises","Lleva un CRM simple: nombre, fecha de contacto, próximo paso. Tres campos, no más.","Practica escuchar al cliente antes de presentar — cuenta hasta 10 antes de hablar","Emparéjate con un perfil Tierra en el equipo — él sostiene lo que tú abres","Celebra los cierres de 60 días, no solo los de primer contacto"],
+    opuesto_trabajo:"Tu cliente Tierra parece lento o cuadrado, pero tiene algo que tú necesitas entender: no compra por entusiasmo — compra por confianza y evidencia. Para venderle a la Tierra: llega puntual, con propuesta escrita, casos documentados y cronograma claro. No improvises en la reunión. Si cambias algo del acuerdo, avísale con tiempo. La consistencia es tu arma con él.",
+    opuesto_hogar:"En la vida personal, la Tierra es tu complemento ideal. Donde tú creas y lanzas, ella construye y sostiene. Juntos: visión y estructura en equilibrio.",
+    plan:["Esta semana: llama a los últimos 3 clientes que cerraste y pregunta cómo van. Solo eso.","Este mes: escribe el proceso de venta de tu producto estrella — paso a paso, sin improvisar.","En 3 meses: toma un curso de gestión de pipeline y seguimiento comercial.","En 6 meses: mide tu tasa de renovación y referidos — no solo nuevas cuentas."],
+    como_abordar:{
+      fuego:"Compite con energía — él responde al reto. Sé tan directo como él. Propón rápido, cierra rápido, o perderá el interés.",
+      agua:"Baja el ritmo al llegar. Pregunta antes de presentar. Él compra relación, no velocidad. Dale espacio para sentirse escuchado.",
+      tierra:"Llega con todo en orden: propuesta escrita, cifras reales, cronograma. No cambies nada en la reunión sin avisar. La improvisación lo aleja.",
+      aire:"Justifica cada afirmación con datos. Él detectará cualquier exageración. Prepara respuestas a sus preguntas técnicas antes de la reunión."
+    }
+  },
+  tierra:{
+    frase:"Cuando tú lo prometes, se cumple. Y eso, en ventas, vale más que cualquier descuento.",
+    esencia:"La Tierra vende desde la credibilidad y el conocimiento. Tu cliente sabe que lo que dices es exacto, que lo que prometes se cumple, y que contigo no hay sorpresas. Eso genera la lealtad más difícil de construir y la más duradera.",
+    fortalezas:["Credibilidad total — el cliente sabe que cumples lo que prometes","Conoces el producto mejor que nadie","Construyes propuestas detalladas y sin errores","Excelente en ventas consultivas y ciclos largos","Cero promesas vacías — tu palabra es tu marca"],
+    sombras:["Tardas en presentar porque quieres tenerlo todo perfecto","Se te dificulta adaptar la propuesta en tiempo real","Puedes parecer rígido cuando el cliente quiere flexibilidad","Pierdes oportunidades mientras preparas la propuesta perfecta"],
+    liderazgo:{tipo:"El Técnico Confiable",desc:"Vendes desde la evidencia y la confianza. El cliente te compra porque sabe que no le vas a fallar. Tu reto es aprender que una propuesta buena a tiempo vale más que una propuesta perfecta tarde."},
+    actividades:["Practica presentar con el 80% listo — la perfección se construye con el cliente, no antes de verlo","Define un tiempo máximo para preparar una propuesta: 24 horas para estándar, 48 para compleja","Aprende a decir 'eso lo ajustamos' en vez de 'tengo que revisarlo' — la flexibilidad también genera confianza","Trabaja con un cliente Fuego — obsérva cómo su velocidad abre puertas que la perfección no alcanza","Celebra los cierres rápidos tanto como los cierres perfectos"],
+    opuesto_trabajo:"Tu cliente Fuego parece impulsivo o poco serio, pero tiene algo que tú necesitas entender: compra por emoción y velocidad. Para venderle al Fuego: ve al grano en los primeros 3 minutos, usa entusiasmo, muestra beneficios concretos y rápidos. No llegues con 20 páginas de propuesta — llega con 3 puntos clave y energía. Si la reunión va bien, él cierra hoy.",
+    opuesto_hogar:"En la vida personal, el Fuego es tu complemento ideal. Donde tú sostienes y ordenas, él crea y renueva. Juntos: estabilidad y movimiento en equilibrio.",
+    plan:["Esta semana: envía una propuesta en menos de 24 horas después de la reunión — aunque no esté perfecta.","Este mes: prepara una presentación de 3 slides para clientes que necesitan respuesta rápida.","En 3 meses: toma un taller de negociación para aprender a ajustar condiciones en tiempo real.","En 6 meses: mide tu tiempo promedio de cierre y ponlo como objetivo de mejora."],
+    como_abordar:{
+      tierra:"Llega puntual, propuesta escrita, sin improvisar. Él valora la consistencia sobre todo. Si algo cambia, avísale con tiempo.",
+      fuego:"Resume en 3 puntos. Ve al beneficio concreto. No lo frenes con detalles — él decide rápido y necesita energía, no carpetas.",
+      agua:"Genera calidez primero. Pregunta por el impacto en su equipo. Él compra cuando confía en la persona, no solo en el producto.",
+      aire:"Muestra el modelo completo: datos, comparativos, análisis. Responde sus preguntas técnicas con precisión. Él necesita entender antes de comprometerse."
+    }
+  },
+  aire:{
+    frase:"Entiendes el negocio del cliente mejor que muchos de sus propios colaboradores. Y eso abre las puertas más difíciles.",
+    esencia:"El Aire vende desde la visión y la inteligencia. Te mueves bien con tomadores de decisión, construyes argumentos irrefutables y anticipas objeciones antes de que el cliente las formule. Tu mayor reto es que muchas ventas no se ganan con lógica — se ganan con conexión.",
+    fortalezas:["Pensamiento estratégico — entiendes el problema antes de ofrecer la solución","Te mueves con facilidad con directivos y C-level","Construyes propuestas de valor sólidas e irrefutables","Anticipas objeciones y las resuelves antes de que aparezcan","Excelente en ventas de alto valor y ciclos largos"],
+    sombras:["Puedes parecer frío o distante — el cliente no te siente cercano","Sobreanalizas y pierdes el timing del cierre","Subestimas el componente emocional de la decisión de compra","Pierdes clientes que ya decidieron comprar mientras terminas de analizar"],
+    liderazgo:{tipo:"El Estratega",desc:"Vendes desde la visión y la lógica. Cuando tu argumento es irrefutable, el cierre fluye solo. Tu reto es aprender que el cliente no solo compra con la cabeza — y que conectar emocionalmente no es debilidad, es estrategia."},
+    actividades:["Practica empezar cada reunión con una pregunta personal antes del negocio — rompe tu propio hielo","Define un 'momento de cierre': cuando el cliente dice algo positivo 3 veces, es el momento de pedir","Aprende a comunicar beneficios emocionales, no solo racionales: 'tu equipo va a sentir...' no solo 'los datos muestran...'","Trabaja con un cliente Agua — obsérva cómo la conexión emocional mueve montañas que la lógica no puede","Limita tu análisis previo a 1 hora máxima — la información perfecta no existe"],
+    opuesto_trabajo:"Tu cliente Agua parece demasiado emocional o impredecible, pero tiene algo que tú necesitas entender: compra por confianza y relación, no por lógica. Para venderle al Agua: empieza por conectar como persona antes de hablar de negocio. Pregunta por su equipo, sus preocupaciones, su contexto. Muestra el impacto humano de tu solución, no solo los números. Él decide con el corazón cuando confía en ti.",
+    opuesto_hogar:"En la vida personal, el Agua es tu complemento ideal. Donde tú analizas, ella siente. Donde tú ves el sistema, ella ve a la persona. Juntos: razón y emoción en equilibrio.",
+    plan:["Esta semana: en tu próxima reunión, haz 2 preguntas personales antes de entrar al negocio.","Este mes: reescribe tu presentación principal agregando el impacto emocional de cada beneficio.","En 3 meses: toma un curso de inteligencia emocional aplicada a ventas.","En 6 meses: mide tu tasa de conversión en primeras reuniones — ahí está tu mayor oportunidad."],
+    como_abordar:{
+      aire:"Llega con datos, modelos y escenarios. Muestra el razonamiento completo. Responde sus preguntas técnicas con precisión — él detectará cualquier argumento débil.",
+      agua:"Muestra el impacto humano de la solución. Empieza por la persona, no por el producto. Él compra cuando confía en ti como persona.",
+      fuego:"Sé conciso — 3 beneficios clave, una propuesta clara, un llamado a la acción. No lo aburras con análisis. Él decide rápido.",
+      tierra:"Lleva precedentes y casos documentados. Muestra que otros ya lo hicieron y les funcionó. La evidencia histórica es su mejor argumento."
+    }
+  }
+};
+
+var S={nombre:"",cargo:"",empresa:"",celular:"",correo:"",respuestas:{},resultado:null};
+var PASO=0;
+var STEPS=["Presentación","El test","Mis resultados"];
+
+function pge(id){return document.getElementById(id);}
+function pmk(tag,cls,txt){var d=document.createElement(tag);if(cls)d.className=cls;if(txt!==undefined)d.textContent=txt;return d;}
+
+function calcScore(){var sc={agua:0,fuego:0,tierra:0,aire:0};Object.keys(S.respuestas).forEach(function(k){var p=k.split("-"),elem=ECOLS[parseInt(p[1])];sc[elem]+=S.respuestas[k];});return sc;}
+function renglonOK(r){var pos=0,neg=0;for(var c=0;c<4;c++){var v=S.respuestas[r+"-"+c];if(v===1)pos++;if(v===-1)neg++;}return pos===1&&neg===1;}
+function countOK(){var n=0;for(var r=0;r<10;r++)if(renglonOK(r))n++;return n;}
+function calcResultado(sc){
+  var orden=["agua","fuego","tierra","aire"].sort(function(a,b){return sc[b]-sc[a];});
+  var negs=["agua","fuego","tierra","aire"].sort(function(a,b){return sc[a]-sc[b];});
+  return{scores:sc,principal:orden[0],complemento:orden[1],opuesto:negs[0]};
+}
+
+function renderStepBar(){
+  var bar=pge("step-bar");bar.innerHTML="";
+  STEPS.forEach(function(lbl,i){
+    if(i>0){var ln=pmk("div","sb-line"+(i<=PASO?" done":""));bar.appendChild(ln);}
+    var item=pmk("div","sb-item");
+    var num=pmk("div","sb-num"+(i===PASO?" act":i<PASO?" done":""),i<PASO?"✓":String(i+1));
+    var ltxt=pmk("span","sb-lbl"+(i<=PASO?" act":""),lbl);
+    item.appendChild(num);item.appendChild(ltxt);bar.appendChild(item);
+  });
+}
+function irA(i){PASO=i;renderStepBar();document.querySelectorAll(".panel").forEach(function(p,j){p.classList.toggle("act",j===i);});window.scrollTo({top:0,behavior:"smooth"});}
+
+function buildPresentacion(){
+  var p=pge("p0");p.innerHTML="";
+  var intro=pmk("div","card card-accent");
+  intro.appendChild(pmk("div","sec-label","Herramienta de autoconocimiento"));
+  intro.appendChild(pmk("div","sec-title","Test de los 4 Elementos"));
+  intro.appendChild(pmk("div","sec-sub","Identifica tu elemento preponderante y comprende cómo impacta tu forma natural de ser, trabajar y relacionarte."));
+  p.appendChild(intro);
+  var nota=pmk("div","note-box");
+  nota.innerHTML="<strong>Importante:</strong> Esta herramienta es un facilitador de autoconocimiento. Los cuatro elementos son marcos de reflexión: ninguno es mejor ni peor. Lo que importa es la consciencia que construyes a partir de este resultado.";
+  p.appendChild(nota);
+  var como=pmk("div","card");
+  como.appendChild(pmk("div","sec-label","Cómo funciona"));
+  var ct=pmk("div");ct.style.cssText="font-size:13px;color:#3A4A5C;line-height:1.7";
+  ct.innerHTML="Vas a responder <strong>10 renglones</strong>, cada uno con 4 palabras.<br><br>— Haz clic <strong>una vez</strong> en la palabra con la que <strong>más</strong> te identificas (+1)<br>— Haz clic <strong>dos veces</strong> en la palabra con la que <strong>menos</strong> te identificas (−1)<br>— Un tercer clic borra la selección<br><br>Cada renglon debe tener exactamente <strong>un +1 y un −1</strong>.";
+  como.appendChild(ct);p.appendChild(como);
+  var form=pmk("div","card");
+  form.appendChild(pmk("div","sec-label","Tus datos"));
+  var g3=pmk("div");g3.style.marginBottom="10px";
+  var l1=pmk("label");l1.style.cssText="font-size:11px;font-weight:700;color:#6B7A8D;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px";l1.textContent="Nombre completo *";
+  var i1=document.createElement("input");i1.className="inp";i1.id="inNom";i1.placeholder="Tu nombre completo";
+  g3.appendChild(l1);g3.appendChild(i1);form.appendChild(g3);
+  var g2=pmk("div");g2.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px";
+  var fg2=pmk("div");var l2=pmk("label");l2.style.cssText="font-size:11px;font-weight:700;color:#6B7A8D;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px";l2.textContent="Cargo";var i2=document.createElement("input");i2.className="inp";i2.id="inCargo";i2.placeholder="Tu cargo";fg2.appendChild(l2);fg2.appendChild(i2);
+  var fg3=pmk("div");var l3=pmk("label");l3.style.cssText="font-size:11px;font-weight:700;color:#6B7A8D;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px";l3.textContent="Área / Equipo";var i3=document.createElement("input");i3.className="inp";i3.id="inArea";i3.placeholder="Tu área o equipo";fg3.appendChild(l3);fg3.appendChild(i3);
+  g2.appendChild(fg2);g2.appendChild(fg3);form.appendChild(g2);
+  var g3=pmk("div");g3.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:10px";
+  var fg4=pmk("div");var l4=pmk("label");l4.style.cssText="font-size:11px;font-weight:700;color:#6B7A8D;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px";l4.textContent="Celular *";var i4=document.createElement("input");i4.className="inp";i4.id="inCelular";i4.placeholder="Tu número de celular";i4.type="tel";fg4.appendChild(l4);fg4.appendChild(i4);
+  var fg5=pmk("div");var l5=pmk("label");l5.style.cssText="font-size:11px;font-weight:700;color:#6B7A8D;text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px";l5.textContent="Correo electrónico *";var i5=document.createElement("input");i5.className="inp";i5.id="inCorreo";i5.placeholder="Tu correo electrónico";i5.type="email";fg5.appendChild(l5);fg5.appendChild(i5);
+  g3.appendChild(fg4);g3.appendChild(fg5);form.appendChild(g3);p.appendChild(form);
+  var nav=pmk("div","nav");nav.style.justifyContent="flex-end";
+  var btn=pmk("button","btn btn-primary","Comenzar el test →");
+  btn.onclick=function(){
+    var nom=(pge("inNom").value||"").trim();
+    var cel=(pge("inCelular").value||"").trim();
+    var cor=(pge("inCorreo").value||"").trim();
+    if(!nom){alert("Por favor ingresa tu nombre para continuar.");pge("inNom").focus();return;}
+    if(!cel){alert("Por favor ingresa tu celular para continuar.");pge("inCelular").focus();return;}
+    if(!cor||cor.indexOf("@")===-1){alert("Por favor ingresa un correo electrónico válido.");pge("inCorreo").focus();return;}
+    S.nombre=nom;S.cargo=(pge("inCargo").value||"").trim();S.empresa=(pge("inArea").value||"").trim();S.celular=cel;S.correo=cor;buildTest();irA(1);};
+  nav.appendChild(btn);p.appendChild(nav);
+}
+
+function buildTest(){
+  var p=pge("p1");p.innerHTML="";
+  var hdr=pmk("div","card card-accent");
+  hdr.appendChild(pmk("div","sec-label","10 renglones · 2 selecciones por renglon"));
+  hdr.appendChild(pmk("div","sec-title","El test"));
+  hdr.appendChild(pmk("div","sec-sub","Marca +1 en la palabra que MÁS te identifica y −1 en la que MENOS te identifica."));
+  p.appendChild(hdr);
+  var pw=pmk("div","prog-wrap");
+  var pl=pmk("div","prog-label","0 de 10 renglones completados");pl.id="prog-lbl";
+  var pt=pmk("div","prog-track");var pf=pmk("div","prog-fill");pf.id="prog-fill";pf.style.width="0%";
+  pt.appendChild(pf);pw.appendChild(pl);pw.appendChild(pt);p.appendChild(pw);
+  var head=pmk("div","test-cols");
+  ["A","B","C","D"].forEach(function(ltr){head.appendChild(pmk("div","col-head","Columna "+ltr));});
+  p.appendChild(head);
+  RENGLONES.forEach(function(ren,r){
+    var wrap=pmk("div","renglon-wrap");
+    wrap.appendChild(pmk("div","renglon-num","Renglon "+(r+1)));
+    var row=pmk("div","renglon");
+    for(var c=0;c<4;c++){
+      var key=r+"-"+c;var op=pmk("div","opcion",ren[c]);op.setAttribute("data-key",key);
+      var cur=S.respuestas[key];if(cur===1)op.className="opcion pos";else if(cur===-1)op.className="opcion neg";
+      op.onclick=(function(k,rn){return function(){
+        var cur2=S.respuestas[k]||0;
+        if(cur2===0){var posN=0;for(var cc=0;cc<4;cc++)if(S.respuestas[rn+"-"+cc]===1)posN++;if(posN>=1){S.respuestas[k]=-1;this.className="opcion neg";}else{S.respuestas[k]=1;this.className="opcion pos";}}
+        else if(cur2===1){var negN=0;for(var cc2=0;cc2<4;cc2++)if(S.respuestas[rn+"-"+cc2]===-1)negN++;if(negN>=1){S.respuestas[k]=0;this.className="opcion";}else{S.respuestas[k]=-1;this.className="opcion neg";}}
+        else{S.respuestas[k]=0;this.className="opcion";}updateProg();
+      };})(key,r);
+      row.appendChild(op);
+    }
+    wrap.appendChild(row);p.appendChild(wrap);
+  });
+  var sc=calcScore();var sr=pmk("div","score-row");
+  ECOLS.forEach(function(e){var sb=pmk("div","score-box");var sv=pmk("span","score-val",String(sc[e]||0));sv.id="scv-"+e;sb.appendChild(sv);sb.appendChild(pmk("span","score-lbl","Col. "+["A","B","C","D"][ECOLS.indexOf(e)]));sr.appendChild(sb);});
+  p.appendChild(sr);
+  var nav=pmk("div","nav");
+  var back=pmk("button","btn btn-ghost","← Anterior");back.onclick=function(){irA(0);};
+  var calc=pmk("button","btn btn-primary","Ver mis resultados →");
+  calc.onclick=function(){
+    if(countOK()<10){alert("Completa todos los renglones antes de continuar. Te faltan "+(10-countOK())+".");return;}
+    var scores=calcScore();
+    if(scores.agua+scores.fuego+scores.tierra+scores.aire!==0){alert("La suma de todos los puntajes debe ser 0. Revisa tus respuestas.");return;}
+    S.resultado=calcResultado(scores);buildResultado();irA(2);
+  };
+  nav.appendChild(back);nav.appendChild(calc);p.appendChild(nav);
+}
+
+function updateProg(){
+  var n=countOK();var lbl=pge("prog-lbl");var fill=pge("prog-fill");
+  if(lbl)lbl.textContent=n+" de 10 renglones completados";
+  if(fill)fill.style.width=(n*10)+"%";
+  var sc=calcScore();
+  ECOLS.forEach(function(e){var v=pge("scv-"+e);if(v)v.textContent=String(sc[e]);});
+}
+
+function buildResultado(){
+  var p=pge("p2");p.innerHTML="";
+  var res=S.resultado;var perf=PERFILES[res.principal];
+  var ec=ECOLOR[res.principal],eb=EBGCSS[res.principal];
+
+  var hdr=pmk("div","card card-accent");
+  hdr.appendChild(pmk("div","sec-label","Tu resultado"));
+  hdr.appendChild(pmk("div","sec-title","Tu mapa elemental, "+S.nombre));
+  p.appendChild(hdr);
+
+  // Hero
+  var hero=pmk("div","elem-hero");
+  hero.style.cssText="border-radius:4px;padding:28px 22px;margin-bottom:14px;border:2px solid "+ec+";background:"+eb+";text-align:center";
+  var sym=pmk("div");sym.style.cssText="font-size:48px;margin-bottom:10px;color:"+ec+";font-weight:700";sym.textContent=SIM[res.principal];
+  var ename=pmk("div");ename.style.cssText="font-size:26px;font-weight:700;color:"+ec+";margin-bottom:8px";ename.textContent="Elemento "+ELN[res.principal];
+  var efrase=pmk("div");efrase.style.cssText="font-size:15px;font-style:italic;color:#3A4A5C;line-height:1.65;margin-bottom:10px";efrase.textContent=perf.frase;
+  var eesen=pmk("div");eesen.style.cssText="font-size:13px;color:#3A4A5C;line-height:1.65;text-align:left";eesen.textContent=perf.esencia;
+  hero.appendChild(sym);hero.appendChild(ename);hero.appendChild(efrase);hero.appendChild(eesen);p.appendChild(hero);
+
+  // Puntajes
+  var csc=pmk("div","card");csc.appendChild(pmk("div","sec-label","Tus puntajes"));
+  var sr=pmk("div","score-row");sr.style.cssText="margin-top:8px;padding-top:0;border-top:none";
+  ECOLS.forEach(function(e){
+    var sb=pmk("div","score-box");sb.style.cssText="border-color:"+ECOLOR[e]+";background:"+EBGCSS[e];
+    var sv=pmk("span","score-val");sv.style.color=ECOLOR[e];sv.textContent=(res.scores[e]>0?"+":"")+res.scores[e];
+    sb.appendChild(sv);sb.appendChild(pmk("span","score-lbl",ELN[e]));sr.appendChild(sb);
+  });
+  csc.appendChild(sr);p.appendChild(csc);
+
+  // Perfil comercial
+  var clid=pmk("div","card");clid.style.borderLeft="3px solid "+ec;
+  clid.appendChild(pmk("div","sec-label","Tu perfil comercial"));
+  var ltag=pmk("div","liderazgo-tag");ltag.style.cssText="background:"+eb+";color:"+ec+";border:1px solid "+ec;ltag.textContent=perf.liderazgo.tipo;
+  clid.appendChild(ltag);
+  var ldesc=pmk("p");ldesc.style.cssText="font-size:13px;color:#3A4A5C;line-height:1.7";ldesc.textContent=perf.liderazgo.desc;
+  clid.appendChild(ldesc);p.appendChild(clid);
+
+  // Cómo venderle a cada elemento
+  var ccom=pmk("div","card");
+  ccom.appendChild(pmk("div","sec-label","Cómo venderle a cada tipo de cliente"));
+  var comDesc=pmk("p");comDesc.style.cssText="font-size:12px;color:#6B7A8D;margin-bottom:12px;font-style:italic";comDesc.textContent="Tu elemento define cómo vendes — pero el elemento de tu cliente define cómo debes acercarte.";
+  ccom.appendChild(comDesc);
+  var elems=[["agua","≈","Agua"],["fuego","△","Fuego"],["tierra","■","Tierra"],["aire","○","Aire"]];
+  elems.forEach(function(el){
+    var isOpp=el[0]===res.opuesto;
+    var row=pmk("div");row.style.cssText="display:flex;gap:10px;padding:10px 12px;border-radius:3px;margin-bottom:6px;border:1px solid "+(isOpp?"#C4973B":"#E2E8F0")+";background:"+(isOpp?"#FDF9F0":"#FAFBFC");
+    var badge=pmk("div");badge.style.cssText="font-size:18px;font-weight:700;color:"+ECOLOR[el[0]]+";min-width:28px;text-align:center;flex-shrink:0;";badge.textContent=el[1];
+    var info=pmk("div");info.style.flex="1";
+    var label=pmk("div");label.style.cssText="font-size:10px;font-weight:700;color:"+ECOLOR[el[0]]+";text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;";
+    label.textContent=el[2].toUpperCase()+(isOpp?" — TU CLIENTE MÁS RETADOR":"");
+    var txt=pmk("p");txt.style.cssText="font-size:12px;color:#3A4A5C;line-height:1.6;";txt.textContent=perf.como_abordar[el[0]];
+    info.appendChild(label);info.appendChild(txt);row.appendChild(badge);row.appendChild(info);ccom.appendChild(row);
+  });
+  p.appendChild(ccom);
+
+  // Fortalezas
+  var cfor=pmk("div","card");cfor.appendChild(pmk("div","sec-label","Tus fortalezas naturales"));
+  var ul=pmk("ul","char-list");
+  perf.fortalezas.forEach(function(f){var li=document.createElement("li");var dot=pmk("div","char-dot");dot.style.background=ec;li.appendChild(dot);li.appendChild(document.createTextNode(f));ul.appendChild(li);});
+  cfor.appendChild(ul);p.appendChild(cfor);
+
+  // Sombras
+  var csom=pmk("div","card");csom.appendChild(pmk("div","sec-label","Áreas de crecimiento personal"));
+  var ul2=pmk("ul","char-list");
+  perf.sombras.forEach(function(s){var li=document.createElement("li");var dot=pmk("div","char-dot");dot.style.background="#8A3A2E";li.appendChild(dot);li.appendChild(document.createTextNode(s));ul2.appendChild(li);});
+  csom.appendChild(ul2);p.appendChild(csom);
+
+  // Opuesto - doble lectura
+  var copp=pmk("div","card");copp.appendChild(pmk("div","sec-label","Tu cliente más retador: "+ELN[res.opuesto]));
+  var obox1=pmk("div","opp-box");obox1.style.cssText="background:"+EBGCSS[res.opuesto]+";border-left:3px solid "+ECOLOR[res.opuesto]+";margin-bottom:10px;padding:14px 16px;border-radius:0 3px 3px 0";
+  var ot1=pmk("div","opp-title");ot1.style.color=ECOLOR[res.opuesto];ot1.textContent="Cómo venderle — lo que debes aprender";
+  var od1=pmk("p","opp-txt");od1.textContent=perf.opuesto_trabajo;
+  obox1.appendChild(ot1);obox1.appendChild(od1);copp.appendChild(obox1);
+  var obox2=pmk("div","opp-box");obox2.style.cssText="background:#F5EFE3;border-left:3px solid #C4973B;padding:14px 16px;border-radius:0 3px 3px 0";
+  var ot2=pmk("div","opp-title");ot2.style.color="#8B5E1A";ot2.textContent="En lo personal: tu complemento natural";
+  var od2=pmk("p","opp-txt");od2.textContent=perf.opuesto_hogar;
+  obox2.appendChild(ot2);obox2.appendChild(od2);copp.appendChild(obox2);
+  p.appendChild(copp);
+
+  // Actividades para potenciar talento
+  var cact=pmk("div","card");cact.appendChild(pmk("div","sec-label","Acciones para potenciar tu venta"));
+  var lact=pmk("div");
+  perf.actividades.forEach(function(act,i){
+    var row=pmk("div","act-item");
+    var num=pmk("span","act-num");num.style.color=ec;num.textContent=String(i+1).padStart(2,"0");
+    var txt=pmk("span");txt.textContent=act;
+    row.appendChild(num);row.appendChild(txt);lact.appendChild(row);
+  });
+  cact.appendChild(lact);p.appendChild(cact);
+
+  // Plan de acción personal
+  var cplan=pmk("div","card");cplan.style.borderTop="3px solid "+ec;
+  cplan.appendChild(pmk("div","sec-label","Tu plan de desarrollo comercial"));
+  var pdesc=pmk("p");pdesc.style.cssText="font-size:13px;color:#6B7A8D;margin-bottom:12px;line-height:1.6;font-style:italic";pdesc.textContent="Un paso a la vez. La consciencia sin acción no transforma.";
+  cplan.appendChild(pdesc);
+  perf.plan.forEach(function(paso,i){
+    var row=pmk("div","act-item");
+    var num=pmk("span","act-num");num.style.color=ec;num.textContent=["→ Semana 1","→ Mes 1","→ 3 meses","→ 6 meses"][i];
+    var txt=pmk("span");txt.textContent=paso;
+    row.appendChild(num);row.appendChild(txt);cplan.appendChild(row);
+  });
+  p.appendChild(cplan);
+
+  // QR de resultados
+  var qrbox=pmk("div","qr-box");
+  qrbox.appendChild(pmk("div","qr-label","Muestra este QR al facilitador"));
+  qrbox.appendChild(pmk("div","qr-sub","El facilitador escanea este código con la cámara del computador o celular para cargar tus resultados directamente en el panel de análisis grupal."));
+  var qrdiv=pmk("div","qr-canvas");qrdiv.id="qr-resultado";qrbox.appendChild(qrdiv);
+  qrbox.appendChild(pmk("div","",""));
+  var qrtxt=pmk("div","qr-code-txt");qrtxt.id="qr-code-str";qrbox.appendChild(qrtxt);
+  var qrsub=pmk("div");qrsub.style.cssText="font-size:11px;color:#6B7A8D;margin-top:8px;";qrsub.textContent="Código de respaldo si no pueden escanear";qrbox.appendChild(qrsub);
+  p.appendChild(qrbox);
+  setTimeout(function(){generarQR();},120);
+
+  // Descarga alternativa
+  var dlbox=pmk("div");dlbox.style.cssText="text-align:center;margin-bottom:14px;";
+  var dltxt=pmk("div");dltxt.style.cssText="font-size:11px;color:#B0BCC8;margin-bottom:8px;";dltxt.textContent="¿No pueden escanear? Descarga el archivo y compártelo.";dlbox.appendChild(dltxt);
+  var dlbtn=pmk("button","btn btn-ghost","Descargar ficha .json");
+  dlbtn.onclick=function(){descargarFicha();};dlbox.appendChild(dlbtn);p.appendChild(dlbox);
+
+  var cierre=pmk("div","card");
+  var ct2=pmk("div");ct2.style.cssText="font-size:14px;color:#3A4A5C;line-height:1.75;text-align:center;font-style:italic";
+  ct2.innerHTML="<strong style=\"color:"+ec+"\">Eres Elemento "+ELN[res.principal]+".</strong> No como una etiqueta — como una ventaja comercial.<br>El vendedor que conoce su elemento y conoce el de su cliente siempre llega mejor preparado a la negociación.";
+  cierre.appendChild(ct2);p.appendChild(cierre);
+
+  var nav=pmk("div","nav");
+  var back=pmk("button","btn btn-ghost","← Revisar test");back.onclick=function(){irA(1);};
+  nav.appendChild(back);p.appendChild(nav);
+}
+
+function descargarFicha(){
+  var r=S.resultado;
+  var ficha={nombre:S.nombre,cargo:S.cargo,area:S.empresa,celular:S.celular,correo:S.correo,fecha:new Date().toLocaleDateString("es-CO",{year:"numeric",month:"long",day:"numeric"}),agua:r.scores.agua,fuego:r.scores.fuego,tierra:r.scores.tierra,aire:r.scores.aire,principal:r.principal,complemento:r.complemento,opuesto:r.opuesto};
+  var blob=new Blob([JSON.stringify(ficha,null,2)],{type:"application/json"});
+  var url=URL.createObjectURL(blob);var a=document.createElement("a");a.href=url;
+  a.download="4elem_"+S.nombre.replace(/\s+/g,"_")+"_"+r.principal+".json";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);URL.revokeObjectURL(url);
+}
+
+function generarQR(){
+  var r=S.resultado;
+  var ficha={nombre:S.nombre,cargo:S.cargo,area:S.empresa,celular:S.celular,correo:S.correo,
+    fecha:new Date().toLocaleDateString("es-CO",{year:"numeric",month:"long",day:"numeric"}),
+    agua:r.scores.agua,fuego:r.scores.fuego,tierra:r.scores.tierra,aire:r.scores.aire,
+    principal:r.principal,complemento:r.complemento,opuesto:r.opuesto};
+  var json=JSON.stringify(ficha);
+  var b64=btoa(unescape(encodeURIComponent(json)));
+  var url="4E:"+b64;
+  // Código corto de respaldo (6 chars)
+  var code=S.nombre.trim().slice(0,3).toUpperCase()+String(Math.abs(r.scores.agua*7+r.scores.fuego*13+r.scores.tierra*11+r.scores.aire*17)%1000).padStart(3,"0");
+  var ct=pge("qr-code-str");if(ct)ct.textContent=code;
+  var qrdiv=pge("qr-resultado");
+  if(!qrdiv)return;
+  qrdiv.innerHTML="";
+  try{
+    new QRCode(qrdiv,{text:url,width:200,height:200,colorDark:"#0D1B2A",colorLight:"#ffffff",correctLevel:QRCode.CorrectLevel.L});
+  }catch(e){
+    qrdiv.innerHTML="<div style=\"padding:20px;font-size:12px;color:#8A3A2E;\">Error generando QR. Usa la descarga .json</div>";
+  }
+}
+function init(){
+  var panels=pge("panels");panels.innerHTML="";
+  STEPS.forEach(function(_,i){var pn=pmk("div","panel");pn.id="p"+i;panels.appendChild(pn);});
+  renderStepBar();buildPresentacion();irA(0);
+}
+init();
+</script>
+</body>
+</html>
